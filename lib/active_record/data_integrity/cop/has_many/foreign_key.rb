@@ -20,7 +20,7 @@ module ActiveRecord
         def valid?(association)
           success = foreign_key?(association)
           unless success
-            from_table = association.class_name.constantize.table_name
+            from_table = association.klass.table_name
             log("has_many #{association.name} but has no foreign key from #{from_table}.id")
           end
           progress(success, 'F')
@@ -41,8 +41,8 @@ module ActiveRecord
 
         def foreign_key?(association)
           to_table = model.table_name
-          from_table = association.class_name.constantize.table_name
-          connection.foreign_keys(association.class_name.constantize.table_name).any? do |foreign_key|
+          from_table = association.klass.table_name
+          connection.foreign_keys(from_table).any? do |foreign_key|
             foreign_key.to_table == to_table && foreign_key.options.fetch(:primary_key) == 'id'
           end || excluded_key?("#{from_table}.id") || excluded_key?(association.name)
         end
